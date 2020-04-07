@@ -108,6 +108,9 @@ type WebView interface {
 	// properly, webview will re-encode it for you.
 	Navigate(url string)
 
+	// Get gets the current active URI of the webview
+	GetURI() string
+
 	// Init injects JavaScript code at the initialization of the new page. Every
 	// time the webview will open a the new page - this initialization code will
 	// be executed. It is guaranteed that code is executed before window.onload.
@@ -183,6 +186,10 @@ func (w *webview) Navigate(url string) {
 	s := C.CString(url)
 	defer C.free(unsafe.Pointer(s))
 	C.webview_navigate(w.w, s)
+}
+
+func (w *webview) GetURI() string {
+	return C.GoString(C.webview_get_uri(w.w))
 }
 
 func (w *webview) SetTitle(title string) {

@@ -80,6 +80,9 @@ WEBVIEW_API void webview_set_size(webview_t w, int width, int height,
 // properly, webview will re-encode it for you.
 WEBVIEW_API void webview_navigate(webview_t w, const char *url);
 
+// Returns the current active URI of the webview
+WEBVIEW_API const char *webview_get_uri(webview_t w);
+
 // Injects JavaScript code at the initialization of the new page. Every time
 // the webview will open a the new page - this initialization code will be
 // executed. It is guaranteed that code is executed before window.onload.
@@ -514,6 +517,10 @@ public:
 
   void navigate(const std::string url) {
     webkit_web_view_load_uri(WEBKIT_WEB_VIEW(m_webview), url.c_str());
+  }
+
+  const char *get_uri() {
+    return webkit_web_view_get_uri(WEBKIT_WEB_VIEW(m_webview));
   }
 
   void init(const std::string js) {
@@ -1196,6 +1203,10 @@ WEBVIEW_API void webview_set_size(webview_t w, int width, int height,
 
 WEBVIEW_API void webview_navigate(webview_t w, const char *url) {
   static_cast<webview::webview *>(w)->navigate(url);
+}
+
+WEBVIEW_API const char *webview_get_uri(webview_t w) {
+  return static_cast<webview::webview *>(w)->get_uri();
 }
 
 WEBVIEW_API void webview_init(webview_t w, const char *js) {
