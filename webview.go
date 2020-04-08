@@ -123,12 +123,11 @@ type WebView interface {
 
 	// Bind binds a callback function so that it will appear under the given name
 	// as a global JavaScript function. Internally it uses webview_init().
-	// Callback receives a request string and a user-provided argument pointer.
-	// Request string is a JSON array of all the arguments passed to the
-	// JavaScript function.
+	// Callback receives a Webview pointer (as the first argument) followed by
+	// the arguments passed to the Javascript function.
 	//
 	// f must be a function
-	// f must return either value and error or just error
+	// f must return either value, error or just error
 	Bind(name string, f interface{}) error
 }
 
@@ -273,16 +272,16 @@ func (w *webview) Bind(name string, f interface{}) error {
 
 		isVariadic := v.Type().IsVariadic()
 		numIn := v.Type().NumIn()
-		if (isVariadic && len(raw) < numIn-1) || (!isVariadic && len(raw) != numIn) {
+		if (isVariadic && len(raw) < numIn-2) || (!isVariadic && len(raw) != numIn-1) {
 			return nil, errors.New("function arguments mismatch")
 		}
-		args := []reflect.Value{}
+		args := append(make([]reflect.Value, 0, len(raw)+1), reflect.ValueOf(w))
 		for i := range raw {
 			var arg reflect.Value
-			if isVariadic && i >= numIn-1 {
+			if isVariadic && i >= numIn-2 {
 				arg = reflect.New(v.Type().In(numIn - 1).Elem())
 			} else {
-				arg = reflect.New(v.Type().In(i))
+				arg = reflect.New(v.Type().In(i + 1))
 			}
 			if err := json.Unmarshal(raw[i], arg.Interface()); err != nil {
 				return nil, err

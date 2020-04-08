@@ -11,14 +11,14 @@ func Example() {
 	w := New(true)
 	defer w.Destroy()
 	w.SetTitle("Hello")
-	w.Bind("noop", func() string {
+	w.Bind("noop", func(wv WebView) string {
 		log.Println("hello")
 		return "hello"
 	})
-	w.Bind("add", func(a, b int) int {
+	w.Bind("add", func(wv WebView, a, b int) int {
 		return a + b
 	})
-	w.Bind("quit", func() {
+	w.Bind("quit", func(wv WebView) {
 		w.Terminate()
 	})
 	w.Navigate(`data:text/html,
